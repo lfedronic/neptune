@@ -1,0 +1,17 @@
+{
+  "name": "neptune",
+  "version": "1.0.0",
+  "description": "software-teaching software",
+  "main": "main.js",
+  "scripts": {
+    "dev": "electron .",
+    "build": "echo build not required for MVP"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^38.1.2"
+  }
+}
