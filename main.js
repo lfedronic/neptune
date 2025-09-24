@@ -226,6 +226,7 @@ ipcMain.on('request-permission-dialog', () => {
   }
   permissionWindow.show();
   permissionWindow.focus();
+  openMacScreenRecordingSettings();
 });
 
 ipcMain.on('close-permission-dialog', () => {
@@ -235,7 +236,14 @@ ipcMain.on('close-permission-dialog', () => {
 });
 
 ipcMain.on('open-permission-settings', () => {
+  openMacScreenRecordingSettings();
+});
+
+function openMacScreenRecordingSettings() {
+  if (process.platform !== 'darwin') {
+    return;
+  }
   const macSettingsUrl = 'x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture';
   shell.openExternal(macSettingsUrl);
-});
+}
 
