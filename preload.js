@@ -4,15 +4,22 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openChat: () => ipcRenderer.send('open-chat'),
   hideChat: () => ipcRenderer.send('hide-chat'),
   onChatOpened: (callback) => {
-    ipcRenderer.removeAllListeners('chat-opened');
-    ipcRenderer.on('chat-opened', (_event) => callback());
+    const listener = () => callback();
+    ipcRenderer.on('chat-opened', listener);
+    return () => ipcRenderer.removeListener('chat-opened', listener);
+  },
+  onChatClosed: (callback) => {
+    const listener = () => callback();
+    ipcRenderer.on('chat-closed', listener);
+    return () => ipcRenderer.removeListener('chat-closed', listener);
   },
   getPrimaryDisplay: () => ipcRenderer.invoke('get-primary-display'),
   saveCapture: (payload) => ipcRenderer.invoke('save-capture', payload),
   startCursorAnimation: () => ipcRenderer.send('start-animation'),
   onStartAnimation: (callback) => {
-    ipcRenderer.removeAllListeners('start-animation');
-    ipcRenderer.on('start-animation', (_event, points) => callback(points));
+    const listener = (_event, payload) => callback(payload);
+    ipcRenderer.on('start-animation', listener);
+    return () => ipcRenderer.removeListener('start-animation', listener);
   },
   animationComplete: () => ipcRenderer.send('animation-complete'),
   showPermissionDialog: () => ipcRenderer.send('request-permission-dialog'),
