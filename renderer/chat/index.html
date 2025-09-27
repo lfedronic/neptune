@@ -7,15 +7,60 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="overlay">
-      <div class="input-wrapper">
-        <textarea
-          id="chat-input"
-          placeholder="Ask the copilot..."
-          rows="1"
-          spellcheck="false"
-        ></textarea>
-        <div id="status" role="status" aria-live="polite"></div>
+    <div class="chat-shell">
+      <div class="chat-panel" role="dialog" aria-label="Neptune copilot chat">
+        <header class="chat-header">
+          <div class="brand">
+            <span class="brand-orb" aria-hidden="true"></span>
+            <div class="brand-copy">
+              <span class="brand-title">Neptune Copilot</span>
+              <span class="brand-subtitle">Glass-clear guidance on demand</span>
+            </div>
+          </div>
+          <button id="collapse-chat" class="ghost-button" aria-label="Collapse copilot chat">
+            <span aria-hidden="true">–</span>
+          </button>
+        </header>
+
+        <section class="insight-section" aria-live="polite">
+          <div class="insight-toolbar">
+            <span id="insight-label" class="insight-label">Overview</span>
+            <div class="insight-controls">
+              <button id="insight-prev" class="ghost-button" aria-label="Previous insight">
+                ‹
+              </button>
+              <span id="insight-counter" class="insight-counter">01 / 02</span>
+              <button id="insight-next" class="ghost-button" aria-label="Next insight">
+                ›
+              </button>
+            </div>
+          </div>
+          <article class="insight-card" data-state="overview">
+            <h2 id="insight-title">All systems ready</h2>
+            <p id="insight-description">
+              Capture anything on your screen and Neptune will wrap it in context, ready for a
+              shareable walkthrough.
+            </p>
+            <ol id="insight-steps" class="insight-steps" aria-label="Next steps"></ol>
+          </article>
+        </section>
+
+        <footer class="chat-input-area">
+          <div class="input-wrapper">
+            <textarea
+              id="chat-input"
+              placeholder="Ask the copilot or describe what you need..."
+              rows="1"
+              spellcheck="false"
+              aria-label="Type a prompt for the copilot"
+            ></textarea>
+            <button id="send-button" class="send-button" aria-label="Capture and share with Neptune">
+              <span class="send-button-glow" aria-hidden="true"></span>
+              <span class="send-button-label">Send</span>
+            </button>
+          </div>
+          <div id="status" role="status" aria-live="polite"></div>
+        </footer>
       </div>
     </div>
     <script src="script.js"></script>

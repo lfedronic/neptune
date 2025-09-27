@@ -6,11 +6,12 @@ let overlayWindow;
 let chatWindow;
 let animationWindow;
 let permissionWindow;
+let lastChatBounds;
 
 const CURSOR_POINTS = [
-  { x: 320, y: 200, message: 'Placeholder: Step 1' },
-  { x: 860, y: 480, message: 'Placeholder: Step 2' },
-  { x: 1280, y: 300, message: 'Placeholder: Step 3' }
+  { x: 320, y: 200, message: 'Mark what matters for Neptune to study first.' },
+  { x: 860, y: 480, message: 'We annotate and narrate the journey in real time.' },
+  { x: 1280, y: 300, message: 'Share the glowing walkthrough with your team.' }
 ];
 
 function createOverlayWindow() {
@@ -36,6 +37,16 @@ function createOverlayWindow() {
   overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   overlayWindow.loadFile(path.join(__dirname, 'renderer', 'overlay', 'index.html'));
 
+  overlayWindow.once('ready-to-show', () => {
+    const display = screen.getPrimaryDisplay();
+    const workArea = display.workArea;
+    const { width, height } = overlayWindow.getBounds();
+    const margin = 24;
+    const x = Math.round(workArea.x + workArea.width - width - margin);
+    const y = Math.round(workArea.y + workArea.height - height - margin);
+    overlayWindow.setBounds({ x, y, width, height });
+  });
+
   overlayWindow.on('closed', () => {
     overlayWindow = null;
   });
@@ -43,8 +54,8 @@ function createOverlayWindow() {
 
 function createChatWindow() {
   chatWindow = new BrowserWindow({
-    width: 520,
-    height: 120,
+    width: 420,
+    height: 520,
     show: false,
     frame: false,
     transparent: true,
@@ -66,7 +77,12 @@ function createChatWindow() {
 
   chatWindow.on('blur', () => {
     if (!chatWindow.webContents.isDevToolsOpened()) {
+      lastChatBounds = chatWindow.getBounds();
       chatWindow.hide();
+      chatWindow.webContents.send('chat-closed');
+      if (overlayWindow) {
+        overlayWindow.webContents.send('chat-closed');
+      }
     }
   });
 
@@ -146,13 +162,21 @@ function showChatWindow() {
     createChatWindow();
   }
   const display = screen.getPrimaryDisplay();
+  const workArea = display.workArea;
   const { width, height } = chatWindow.getBounds();
-  const targetX = Math.round(display.bounds.x + (display.bounds.width - width) / 2);
-  const targetY = Math.round(display.bounds.y + (display.bounds.height - height) / 2);
+  const margin = 24;
+  const baseX = workArea.x + workArea.width - width - margin;
+  const baseY = workArea.y + workArea.height - height - margin - 40;
+  const targetX = Math.max(workArea.x + margin, Math.round(baseX));
+  const targetY = Math.max(workArea.y + margin, Math.round(baseY));
   chatWindow.setBounds({ x: targetX, y: targetY, width, height });
+  lastChatBounds = { x: targetX, y: targetY, width, height };
   chatWindow.show();
   chatWindow.focus();
   chatWindow.webContents.send('chat-opened');
+  if (overlayWindow) {
+    overlayWindow.webContents.send('chat-opened');
+  }
 }
 
 function showAnimationWindow() {
@@ -162,7 +186,17 @@ function showAnimationWindow() {
   const display = screen.getPrimaryDisplay();
   animationWindow.setBounds(display.bounds);
   animationWindow.show();
-  animationWindow.webContents.send('start-animation', CURSOR_POINTS);
+  const chatBounds = lastChatBounds || (chatWindow ? chatWindow.getBounds() : null);
+  const origin = chatBounds
+    ? {
+        x: chatBounds.x + chatBounds.width - 48,
+        y: chatBounds.y + chatBounds.height - 48
+      }
+    : null;
+  animationWindow.webContents.send('start-animation', {
+    points: CURSOR_POINTS,
+    origin
+  });
 }
 
 app.whenReady().then(() => {
@@ -192,6 +226,11 @@ ipcMain.on('open-chat', () => {
 ipcMain.on('hide-chat', () => {
   if (chatWindow) {
     chatWindow.hide();
+    lastChatBounds = chatWindow.getBounds();
+    chatWindow.webContents.send('chat-closed');
+    if (overlayWindow) {
+      overlayWindow.webContents.send('chat-closed');
+    }
   }
 });
 

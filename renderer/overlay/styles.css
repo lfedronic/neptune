@@ -14,46 +14,94 @@ body {
   height: 100%;
   background: transparent;
   font-family: 'SF Pro Text', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
 }
 
 #overlay-button {
   position: relative;
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   outline: none;
   cursor: pointer;
-  background: rgba(65, 105, 225, 0.85);
-  box-shadow: 0 12px 32px rgba(65, 105, 225, 0.45);
+  background: linear-gradient(145deg, rgba(21, 28, 45, 0.6), rgba(31, 47, 76, 0.3));
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: 0 24px 50px rgba(0, 10, 40, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  color: #fff;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.3s ease;
+  color: #f8fbff;
   overflow: hidden;
 }
 
+#overlay-button::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 18px rgba(125, 200, 255, 0.22);
+  opacity: 0.85;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
 #overlay-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 16px 40px rgba(65, 105, 225, 0.6);
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 30px 60px rgba(0, 15, 60, 0.55);
 }
 
 #overlay-button:active {
-  transform: scale(0.96);
+  transform: translateY(0) scale(0.97);
 }
 
 #overlay-button .glow {
   position: absolute;
-  inset: -40%;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.5), transparent 60%);
-  opacity: 0.8;
+  inset: -45%;
+  background: radial-gradient(circle at 35% 30%, rgba(160, 206, 255, 0.45), transparent 65%);
+  opacity: 0.9;
   pointer-events: none;
+  filter: blur(2px);
+  animation: shimmer 4.5s ease-in-out infinite;
 }
 
 #overlay-button .label {
   position: relative;
   font-size: 28px;
   line-height: 1;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 0 14px rgba(160, 206, 255, 0.8);
   pointer-events: none;
+  transition: transform 0.3s ease;
+}
+
+#overlay-button.active {
+  border-color: rgba(123, 202, 255, 0.65);
+  box-shadow: 0 28px 72px rgba(35, 120, 255, 0.55);
+}
+
+#overlay-button.active::after {
+  opacity: 1;
+}
+
+#overlay-button.active .label {
+  transform: scale(0.9);
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    transform: translate(-10%, -12%) scale(1);
+    opacity: 0.6;
+  }
+  45% {
+    transform: translate(8%, 6%) scale(1.05);
+    opacity: 1;
+  }
 }
